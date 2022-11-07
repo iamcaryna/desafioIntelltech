@@ -1,0 +1,26 @@
+.modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay {
+    z-index: 100;
+    position: fixed;
+    top: 10vh;
+    width: 50%;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+    border-radius: 8px;
+}
+
+.modal header {
+    text-align: center;
+}
+
+.modal footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px;
+}
