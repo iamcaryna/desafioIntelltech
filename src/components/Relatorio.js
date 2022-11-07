@@ -1,28 +1,25 @@
 import React, { useState } from "react";
-import Draggable from "react-draggable";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 
 // material ui
-import TextField from "@mui/material/TextField";
-import Select from "@mui/material/Select";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Radio from "@mui/material/Radio";
-import RadioGroup from "@mui/material/RadioGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Button from "@mui/material/Button";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
-import IconButton from "@mui/material/IconButton";
-import DeleteIcon from "@mui/icons-material/Delete";
-import Icon from "@mui/material/Icon";
-import BarChartIcon from "@mui/icons-material/BarChart";
+import {
+  TextField,
+  Select,
+  InputLabel,
+  MenuItem,
+  FormControl,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+  Button,
+  List,
+} from "@mui/material";
 
 import Modal from "./Modal";
-import Grafico from "./Grafico";
+import ComponenteImagem from "./ComponenteImagem";
+import ComponenteGrafico from "./ComponenteGrafico";
+import ListaComponentes from "./ListaComponentes";
 import "./Relatorio.css";
 
 const Relatorio = () => {
@@ -34,7 +31,7 @@ const Relatorio = () => {
   const [grafico_aux, setGrafico_aux] = useState(null);
   const [borda, setBorda] = useState();
   const [bordaValue, setBordaValue] = useState();
-  const [cor, setCor] = useState();
+  const [cor, setCor] = useState("#000000");
   const [titulo, setTitulo] = useState("");
 
   const openModal = () => {
@@ -55,6 +52,7 @@ const Relatorio = () => {
       setImagem([
         ...imagem,
         {
+          id: uidv4(),
           imagem: imagem_aux,
           titulo: titulo,
           borda: borda,
@@ -67,6 +65,7 @@ const Relatorio = () => {
       setGrafico([
         ...grafico,
         {
+          id: uidv4(),
           tipo: grafico_aux,
           titulo: titulo,
           borda: borda,
@@ -82,15 +81,24 @@ const Relatorio = () => {
     setTitulo();
     setBorda();
     setBordaValue();
-    setCor();
+    setCor("#000000");
     setModalIsOpen(false);
   };
 
-  const deleteImagem = (event, img) => {
-    event.preventDefault();
-    let index = imagem.findIndex((i) => i.imagem === img);
+  const uidv4 = () => {
+    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
+      (
+        c ^
+        (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
+      ).toString(16)
+    );
+  };
 
-    imagem.splice(index, 1);
+  const deleteItem = (id, tipo, arr) => {
+    let x = arr.filter((item) => item.id !== id);
+
+    if (tipo === 0) setImagem(x);
+    else setGrafico(x);
   };
 
   const generatePDF = () => {
@@ -248,51 +256,11 @@ const Relatorio = () => {
           Imprimir
         </Button>
       </div>
-      <div className="div-a4-componentes">
+      <div className="div-relatorio">
         <div id="a4">
-          {imagem.length ? (
-            imagem.map((img) => {
-              return (
-                <Draggable bounds="parent">
-                  <div className="image">
-                    {img.titulo && <p>{img.titulo}</p>}
-                    <img
-                      style={{
-                        border: `${img.largura}px solid ${img.cor}`,
-                        borderRadius: "5px",
-                      }}
-                      className="image"
-                      alt="not fount"
-                      width={"250px"}
-                      src={URL.createObjectURL(img.imagem)}
-                    />
-                  </div>
-                </Draggable>
-              );
-            })
-          ) : (
-            <></>
-          )}
-          {grafico &&
-            grafico.map((g) => {
-              return (
-                <Draggable bounds="parent">
-                  <div className="grafico">
-                    {titulo && <p>{g.titulo}</p>}
-                    <div
-                      style={{
-                        border: `${g.largura}px solid ${g.cor}`,
-                        borderRadius: "5px",
-                      }}
-                    >
-                      <Grafico tipo={g.tipo} />
-                    </div>
-                  </div>
-                </Draggable>
-              );
-            })}
+          <ComponenteImagem imagem={imagem} />
+          <ComponenteGrafico grafico={grafico} />
         </div>
-
         <div className="div-componentes">
           <h3>Imagens</h3>
           <List
@@ -301,35 +269,12 @@ const Relatorio = () => {
             {imagem.length ? (
               imagem.map((x) => {
                 return (
-                  <ListItem>
-                    <Icon style={{ marginRight: 5 }}>
-                      <img
-                        className="image"
-                        alt="not fount"
-                        width={"250px"}
-                        src={URL.createObjectURL(x.imagem)}
-                      />
-                    </Icon>
-                    {x.titulo ? (
-                      <ListItemText
-                        id={"aria-labelledby"}
-                        primary={`Título: ${x.titulo}.`}
-                      />
-                    ) : (
-                      <ListItemText
-                        id={"aria-labelledby"}
-                        primary={"Imagem sem título."}
-                      />
-                    )}
-
-                    <IconButton
-                      edge="end"
-                      aria-label="comments"
-                      onClick={(e) => deleteImagem(e, x.imagem)}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </ListItem>
+                  <ListaComponentes
+                    componente="imagem"
+                    icon={x.imagem}
+                    titulo={x.titulo}
+                    delete={() => deleteItem(x.id, 0, imagem)}
+                  />
                 );
               })
             ) : (
@@ -337,6 +282,7 @@ const Relatorio = () => {
             )}
           </List>
         </div>
+
         <div className="div-componentes">
           <h3>Gráficos</h3>
           <List
@@ -345,30 +291,12 @@ const Relatorio = () => {
             {grafico.length ? (
               grafico.map((x) => {
                 return (
-                  <ListItem>
-                    <Icon style={{ marginRight: 5 }}>
-                      <BarChartIcon />
-                    </Icon>
-                    {x.titulo ? (
-                      <ListItemText
-                        id={"aria-labelledby"}
-                        primary={`Título: ${x.titulo}.`}
-                      />
-                    ) : (
-                      <ListItemText
-                        id={"aria-labelledby"}
-                        primary={"Gráfico sem título."}
-                      />
-                    )}
-
-                    <IconButton
-                      edge="end"
-                      aria-label="comments"
-                      // onClick={(e) => deleteImagem(e, x.imagem)}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </ListItem>
+                  <ListaComponentes
+                    componente="grafico"
+                    icon=""
+                    titulo={x.titulo}
+                    delete={() => deleteItem(x.id, 1, grafico)}
+                  />
                 );
               })
             ) : (

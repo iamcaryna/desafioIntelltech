@@ -17,6 +17,7 @@
     "re-resizable": "^6.9.9",
     "react": "^18.2.0",
     "react-draggable": "^4.4.5",
+    "react-resizable": "^3.0.4",
     "react-scripts": "^2.1.8",
     "web-vitals": "^2.1.4"
   },

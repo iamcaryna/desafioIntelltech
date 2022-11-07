@@ -77,7 +77,7 @@ const Grafico = (props) => {
   };
 
   return (
-    <div>
+    <div style={{ width: "100%", height: "100%" }}>
       {props.tipo === "linha" && <ReactEcharts option={optionLine} />}
 
       {props.tipo === "barra" && <ReactEcharts option={optionBar} />}
