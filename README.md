@@ -1,6 +1,6 @@
 # Desafio Intelltec - Relatório Dinâmico
 
-Para executar a aplicação é necessário possuir o NodeJS(8.11.0) instalado.
+## Para executar a aplicação é necessário possuir o NodeJS(8.11.0) instalado.
 
 1 - Clonar (fazer download) do repositório.
 2 - No terminal, navegar até o diretório onde foi salvo o projeto.
